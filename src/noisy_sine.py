@@ -21,6 +21,20 @@ def parse_arguments():
 
     return parser.parse_args()
 
+def PlotMe(X, y, y_pred):
+    plt.figure(figsize=(12,5))
+    plt.plot(X, y, label = 'Original')
+    plt.plot(X, y_pred, label = 'Pridicted')
+
+    #plt.xticks(range(0, 360, 10))
+    #plt.xticks(rotation=90)
+    plt.xlabel('X')
+    plt.ylabel('y')
+    #plt.title('Pertubation (PGD) vs. Accuracy')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
 ######################################################################################################################
 # 
 class CPlot:
@@ -76,7 +90,7 @@ class CPlot:
 
         plt.title(f'Bound propagation')
         plt.legend()
-
+        plt.grid(True)
         plt.show()
         # plt.savefig(f'visualization/lbp.pdf', bbox_inches='tight', dpi=300)
 
@@ -218,7 +232,7 @@ class CConsole:
         print('CConsole')
         self.mNet = Model(dim=cDim).to(cDevice)
 
-    def Init(self):
+    def init(self):
         dataset = NoisySineDataset(dim=cDim, train_size=2**12)
         self.X, self.y = dataset[:]
         self.X, self.y = self.X.to(cDevice), self.y.to(cDevice)
@@ -229,7 +243,9 @@ class CConsole:
         self.optimizer = optim.Adam(self.mNet.parameters(), lr=4e-3)
         self.criterion = nn.MSELoss(reduction='none')
 
-    def train(self, eps=0.005):
+    def train(self, strModelName, eps=0.005):
+        self.init()
+
         for epoch in trange(1000):
             self.optimizer.zero_grad(set_to_none=True)
 
@@ -250,15 +266,22 @@ class CConsole:
 
                     print(f"loss: {loss:>7f}")
 
+            torch.save({'state_dict': self.bounded_model.state_dict(), 'epoch': epoch}, strModelName)
+
+        print('Training Done')
+            
+
     #-----------------------------
     def evaluate(self):
-        criterion = nn.MSELoss()
-
         dataset = NoisySineDataset(dim=cDim)
         X_train, y_train = dataset[:]
         X, y = X_train.to(cDevice), y_train.to(cDevice)
 
         y_pred = self.mNet(X)
+
+        PlotMe(X, y, y_pred)
+
+        criterion = nn.MSELoss()
         loss = criterion(y_pred, y)
 
         print(f'MSE: {loss.item()}')
@@ -275,8 +298,11 @@ class CConsole:
             raise NotImplementedError()
 
     @torch.no_grad()
-    def test(self):
-        os.makedirs('visualization', exist_ok=True)
+    def test(self, strModelPath):
+        #os.makedirs('visualization', exist_ok=True)
+        checkpoint = torch.load(strModelPath, map_location=torch.device(cDevice))
+        self.mNet.load_state_dict(checkpoint["state_dict"])
+        self.mNet.eval()
 
         self.evaluate()
         self.plot_bounds()
@@ -288,6 +314,13 @@ if __name__ == '__main__':
     cDim = 1 # 2 for 3D
 
     objCon = CConsole()
-    objCon.Init()
-    objCon.train()
-    objCon.test()
+
+    cCommand = 'TEST' # 'TRAIN' # 
+    
+    fEPS = 0.01
+    strModelName = './working_data/noisy_size_' + str(fEPS) + '.pth'
+
+    if cCommand == 'TRAIN':
+        objCon.train(strModelName, fEPS)
+    elif cCommand == 'TEST':
+        objCon.test(strModelName)
