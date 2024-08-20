@@ -24,7 +24,7 @@ def parse_arguments():
 def PlotMe(X, y, y_pred):
     plt.figure(figsize=(12,5))
     plt.plot(X, y, label = 'Original')
-    plt.plot(X, y_pred, label = 'Pridicted')
+    plt.plot(X, y_pred, label = 'Predicted')
 
     #plt.xticks(range(0, 360, 10))
     #plt.xticks(rotation=90)
@@ -79,14 +79,14 @@ class CPlot:
             y1, y2 = y1.item(), y2.item()
             y3, y4 = y3.item(), y4.item()
 
-            plt.plot([x1, x2], [y1, y2], color='green', label='CROWN lower' if i == 0 else None)
+            plt.plot([x1, x2], [y1, y2], color='darkgreen', label='CROWN lower' if i == 0 else None)
             plt.plot([x1, x2], [y3, y4], color='red', label='CROWN upper' if i == 0 else None)
 
         X = torch.linspace(-2, 2, 1000, device=cDevice).view(-1, 1)
         y = self.mNet(X)
         X, y = X.cpu().numpy(), y.cpu().numpy()
 
-        plt.plot(X, y, color='blueviolet', label='Function to bound')
+        plt.plot(X, y, color='black', label='Function to bound')
 
         plt.title(f'Bound propagation')
         plt.legend()
@@ -309,7 +309,9 @@ class CConsole:
 
 ########################################################################################################################
 if __name__ == '__main__':
-    args = parse_arguments()
+    #args = parse_arguments()
+    os.makedirs('./working_data', exist_ok=True)
+    
     cDevice = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     cDim = 1 # 2 for 3D
 
