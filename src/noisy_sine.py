@@ -285,7 +285,7 @@ class CConsole:
 if __name__ == '__main__':
     args = parse_arguments()
     cDevice = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    cDim = 1
+    cDim = 1 # 2 for 3D
 
     objCon = CConsole()
     objCon.Init()
