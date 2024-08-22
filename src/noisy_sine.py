@@ -252,6 +252,7 @@ class CConsole:
             y_pred = self.mNet(self.X)
             loss = self.criterion(y_pred, self.y).mean()
 
+            # general::ibp
             interval_bounds = self.bounded_model.ibp(HyperRectangle.from_eps(self.X, eps))
             loss = loss + torch.max(self.criterion(interval_bounds.lower, self.y), 
                                     self.criterion(interval_bounds.upper, self.y)).mean()
