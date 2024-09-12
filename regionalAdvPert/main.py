@@ -18,6 +18,9 @@ from regional_attack import RegionalAdversarialAttack
 
 ##########################################################################
 #
+# C:\Users\admin/.cache\torch\hub\checkpoints\resnet50-0676ba61.pth
+# "https://download.pytorch.org/models/alexnet-owt-7be5be79.pth" to 
+# C:\Users\admin/.cache\torch\hub\checkpoints\alexnet-owt-7be5be79.pth
 if __name__ == '__main__':
     # GPU ID
     DEVICE_ID = 0
