@@ -1,4 +1,7 @@
 import os
+import sys
+sys.path.append('.')
+
 from argparse import ArgumentParser
 from math import sqrt
 
