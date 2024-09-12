@@ -13,9 +13,11 @@ from funct_misc import (create_square_loc_matrix,
                         read_input_image,
                         get_random_target_class,
                         save_input_image)
+
 from regional_attack import RegionalAdversarialAttack
 
-
+##########################################################################
+#
 if __name__ == '__main__':
     # GPU ID
     DEVICE_ID = 0
@@ -39,20 +41,24 @@ if __name__ == '__main__':
     # localization_matrix, selected_pix_percentage = \
     #     create_random_loc_matrix(selected_pix_pectentage)
 
-    localization_matrix = localization_matrix.float().cuda(DEVICE_ID)
+    localization_matrix = localization_matrix.float() #.cuda(DEVICE_ID)
 
     # Model to generate adversarial examples
-    model1 = models.alexnet(pretrained=True).cuda(DEVICE_ID)
+    model1 = models.alexnet(pretrained=True) #.cuda(DEVICE_ID)
     model1.eval()
-    model1 = NNModel(model1, Normalization(DEVICE_ID), 0).cuda(DEVICE_ID)
+
+    model1 = NNModel(model1, Normalization(), 0) #.cuda(DEVICE_ID)
+    
     # Model to test adversarial exampels
-    model2 = models.resnet50(pretrained=True).cuda(DEVICE_ID)
+    model2 = models.resnet50(pretrained=True) #.cuda(DEVICE_ID)
     model2.eval()
-    model2 = NNModel(model2, Normalization(DEVICE_ID), 0).cuda(DEVICE_ID)
+    model2 = NNModel(model2, Normalization(), 0) #.cuda(DEVICE_ID)
+    
     # Define the regional attack
-    regional_attack = RegionalAdversarialAttack(model1, model2, DEVICE_ID)
+    regional_attack = RegionalAdversarialAttack(model1, model2)
+    
     # Read the image
-    im = read_input_image('../data/', 'sample_image.png')
+    im = read_input_image('./working_data/', 'sample_image.png')
 
     """
     # Placeholder code to check if the image is predicted correctly by both of the models
@@ -69,4 +75,4 @@ if __name__ == '__main__':
     print('Init class:', org_pred, 'Adv class:', adv_target)
 
     l0_norm, l2_norm, linf_norm, adv_im = regional_attack.generate(im, org_pred, adv_target, localization_matrix)
-    save_input_image(adv_im, 'adversarial_example', folder_name='../output_images')
+    save_input_image(adv_im, 'adversarial_example', folder_name='./working_data')

@@ -12,17 +12,19 @@ import torch
 
 
 class RegionalAdversarialAttack():
-    def __init__(self, model1, model2, device_id):
+    def __init__(self, model1, model2):
         # Model to generate adversarial perturbation
         self.model1 = model1
         self.model1.eval()
-        self.model1.cuda(device_id)
+        self.model1 #.cuda(device_id)
+        
         # Model to test adversarial example against
         self.model2 = model2
         self.model2.eval()
-        self.model2.cuda(device_id)
+        self.model2 #.cuda(device_id)
+        
         # Other necessary parameters
-        self.device_id = device_id
+        #self.device_id = device_id
         self.ce = nn.CrossEntropyLoss()
 
     def localize_perturbation(self, image_to_perturb, perturbation, localization_matrix):
@@ -44,9 +46,10 @@ class RegionalAdversarialAttack():
 
     def generate(self, im, org_class, target_class, localization_matrix):
         # Copy the original (unperturbed) image to calculate L_p distances later
-        org_im = copy.copy(im).cuda(self.device_id)
-        self.im_label_as_var = Variable(torch.from_numpy(np.asarray([target_class]))).cuda(self.device_id)
-        self.processed_image = Variable(im.cuda(self.device_id), requires_grad=True)
+        org_im = copy.copy(im) #.cuda(self.device_id)
+        self.im_label_as_var = Variable(torch.from_numpy(np.asarray([target_class]))) #.cuda(self.device_id)
+        self.processed_image = Variable(im, #.cuda(self.device_id), 
+                                        requires_grad=True)
 
         l0_norm, l2_norm, linf_norm, adv_im = None, None, None, None
         # Start optimization

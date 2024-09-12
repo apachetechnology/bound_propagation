@@ -23,10 +23,10 @@ random.seed(3)
 class Normalization(nn.Module):
     # Normalization for neural network input
     # You might not need this depending on how you preprocess data
-    def __init__(self, device_id):
+    def __init__(self):
         super(Normalization, self).__init__()
-        self.mean = torch.tensor([0.485, 0.456, 0.406]).view(-1, 1, 1).float().cuda(device_id)
-        self.std = torch.tensor([0.229, 0.224, 0.225]).view(-1, 1, 1).float().cuda(device_id)
+        self.mean = torch.tensor([0.485, 0.456, 0.406]).view(-1, 1, 1).float() #.cuda(device_id)
+        self.std = torch.tensor([0.229, 0.224, 0.225]).view(-1, 1, 1).float() #.cuda(device_id)
 
     def forward(self, img):
         return ((img - self.mean) / self.std).unsqueeze(0)
